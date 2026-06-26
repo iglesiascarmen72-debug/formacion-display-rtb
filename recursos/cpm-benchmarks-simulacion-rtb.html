@@ -1,0 +1,151 @@
+
+<style>
+  body { font-size: 15px; }
+  .wrap { padding: 1.5rem 0; }
+  .caso-block { margin-bottom: 2rem; }
+  .caso-header { display: flex; align-items: center; gap: 10px; margin-bottom: 0.75rem; }
+  .caso-num { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 500; flex-shrink: 0; }
+  .caso-1 .caso-num { background: #E6F1FB; color: #0C447C; }
+  .caso-2 .caso-num { background: #E1F5EE; color: #085041; }
+  .caso-3 .caso-num { background: #FAEEDA; color: #633806; }
+  .caso-title { font-size: 15px; font-weight: 500; color: var(--color-text-primary); }
+  .caso-sub { font-size: 13px; color: var(--color-text-secondary); margin-top: 1px; }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 0.875rem; }
+  .tag { font-size: 12px; padding: 3px 9px; border-radius: var(--border-radius-md); border: 0.5px solid; }
+  .tag-blue { background: #E6F1FB; color: #0C447C; border-color: #85B7EB; }
+  .tag-green { background: #E1F5EE; color: #085041; border-color: #5DCAA5; }
+  .tag-amber { background: #FAEEDA; color: #633806; border-color: #EF9F27; }
+  .tag-gray { background: #F1EFE8; color: #444441; border-color: #B4B2A9; }
+  .tag-coral { background: #FAECE7; color: #712B13; border-color: #F0997B; }
+  .grupos { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-bottom: 0.75rem; }
+  .grupo-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 0.875rem 1rem; }
+  .grupo-label { font-size: 11px; font-weight: 500; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
+  .grupo-cpm { font-size: 20px; font-weight: 500; color: var(--color-text-primary); line-height: 1.2; }
+  .grupo-rol { font-size: 12px; color: var(--color-text-secondary); margin-top: 4px; }
+  .razon { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 0.75rem 1rem; font-size: 13px; color: var(--color-text-secondary); line-height: 1.6; border-left: 3px solid var(--color-border-secondary); border-radius: 0 var(--border-radius-md) var(--border-radius-md) 0; }
+  .razon strong { color: var(--color-text-primary); font-weight: 500; }
+  .divider { border: none; border-top: 0.5px solid var(--color-border-tertiary); margin: 1.5rem 0; }
+  .nota-global { background: var(--color-background-secondary); border-radius: var(--border-radius-lg); padding: 1rem 1.25rem; font-size: 13px; color: var(--color-text-secondary); line-height: 1.65; margin-top: 1.5rem; }
+  .nota-global strong { color: var(--color-text-primary); font-weight: 500; }
+</style>
+
+<div class="wrap">
+  <h2 style="font-size:18px; font-weight:500; margin:0 0 0.25rem;">Rangos de CPM por caso · España 2025</h2>
+  <p style="font-size:13px; color:var(--color-text-secondary); margin:0 0 1.5rem;">Open RTB, mercado español. Los grupos simulan distintos perfiles de DSP / estrategia de puja.</p>
+
+  <div class="caso-block caso-1">
+    <div class="caso-header">
+      <div class="caso-num">1</div>
+      <div>
+        <div class="caso-title">Medio generalista · portada noticias · 300×250 ATF desktop</div>
+        <div class="caso-sub">Audiencia general, viewability 55%, floor 0,80 €</div>
+      </div>
+    </div>
+    <div class="tags">
+      <span class="tag tag-gray">Inventario commodity</span>
+      <span class="tag tag-gray">Sin segmento específico</span>
+      <span class="tag tag-gray">Alta competencia</span>
+      <span class="tag tag-gray">Desktop favorece viewability</span>
+    </div>
+    <div class="grupos">
+      <div class="grupo-card">
+        <div class="grupo-label">Grupo A · conservador</div>
+        <div class="grupo-cpm">0,80 – 1,20 €</div>
+        <div class="grupo-rol">Raspa el floor. Retargeting amplio o prospecting sin data.</div>
+      </div>
+      <div class="grupo-card">
+        <div class="grupo-label">Grupo B · medio</div>
+        <div class="grupo-cpm">1,20 – 1,80 €</div>
+        <div class="grupo-rol">Algo de segmentación contextual o sociodemográfica básica.</div>
+      </div>
+      <div class="grupo-card">
+        <div class="grupo-label">Grupo C · agresivo</div>
+        <div class="grupo-cpm">1,80 – 2,50 €</div>
+        <div class="grupo-rol">Retargeting propio o 1st-party data del anunciante.</div>
+      </div>
+    </div>
+    <div class="razon">
+      <strong>Por qué este rango:</strong> inventario generalista sin nicho definido. La audiencia "general" no tiene valor diferencial para la mayoría de anunciantes. ATF desktop sube ligeramente frente a BTF. CPM medio real de open market en España ronda 0,80–1,50 €. El techo (2,50 €) solo lo justifica retargeting con 1st-party data muy preciso.
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <div class="caso-block caso-2">
+    <div class="caso-header">
+      <div class="caso-num">2</div>
+      <div>
+        <div class="caso-title">LetsFamily · artículo embarazo · 300×250 ATF mobile</div>
+        <div class="caso-sub">Embarazadas / familias con bebé, viewability 60%, floor 1,20 €</div>
+      </div>
+    </div>
+    <div class="tags">
+      <span class="tag tag-green">Nicho de alto valor</span>
+      <span class="tag tag-green">Audiencia cualificada</span>
+      <span class="tag tag-coral">Mobile descuenta ~15%</span>
+      <span class="tag tag-green">Contexto señal fuerte</span>
+    </div>
+    <div class="grupos">
+      <div class="grupo-card">
+        <div class="grupo-label">Grupo A · conservador</div>
+        <div class="grupo-cpm">1,20 – 1,80 €</div>
+        <div class="grupo-rol">Puja contextual básica. Marcas de gran consumo sin data propia.</div>
+      </div>
+      <div class="grupo-card">
+        <div class="grupo-label">Grupo B · medio</div>
+        <div class="grupo-cpm">1,80 – 2,80 €</div>
+        <div class="grupo-rol">Categoría bebés/puericultura. Anunciantes como Dodot, Chicco, Bimanan.</div>
+      </div>
+      <div class="grupo-card">
+        <div class="grupo-label">Grupo C · agresivo</div>
+        <div class="grupo-cpm">2,80 – 4,50 €</div>
+        <div class="grupo-rol">Retargeting pharma, seguros, financieras con data de maternidad.</div>
+      </div>
+    </div>
+    <div class="razon">
+      <strong>Por qué este rango:</strong> nicho parenting/maternidad tiene demanda sostenida de anunciantes con alto LTV (seguros de vida, clínicas, puericultura premium, financieras). El contexto actúa como señal de intención muy precisa. Mobile aplica un descuento por peor viewability y menor tasa de conversión, pero la audiencia compensa. Este inventario en deal privado con Seedtag o PMP llegaría a 5–8 €.
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <div class="caso-block caso-3">
+    <div class="caso-header">
+      <div class="caso-num">3</div>
+      <div>
+        <div class="caso-title">Medio tecnología · review móviles · 728×90 BTF desktop</div>
+        <div class="caso-sub">Usuarios tech, viewability 38%, floor 1,50 €</div>
+      </div>
+    </div>
+    <div class="tags">
+      <span class="tag tag-amber">Viewability crítica: 38%</span>
+      <span class="tag tag-blue">Audiencia premium tech</span>
+      <span class="tag tag-coral">Megabanner BTF penalizado</span>
+      <span class="tag tag-amber">Floor alto vs. viewability baja</span>
+    </div>
+    <div class="grupos">
+      <div class="grupo-card">
+        <div class="grupo-label">Grupo A · conservador</div>
+        <div class="grupo-cpm">1,50 – 1,90 €</div>
+        <div class="grupo-rol">Raspa el floor. Muchos DSPs excluirán este slot por viewability &lt;50%.</div>
+      </div>
+      <div class="grupo-card">
+        <div class="grupo-label">Grupo B · medio</div>
+        <div class="grupo-cpm">1,90 – 2,80 €</div>
+        <div class="grupo-rol">Marcas tech (telecos, fabricantes) que valoran el contexto sobre viewability.</div>
+      </div>
+      <div class="grupo-card">
+        <div class="grupo-label">Grupo C · agresivo</div>
+        <div class="grupo-cpm">2,80 – 4,00 €</div>
+        <div class="grupo-rol">Anunciantes de electrónica/gaming con retargeting propio. Muy escasos.</div>
+      </div>
+    </div>
+    <div class="razon">
+      <strong>El conflicto de este caso:</strong> la audiencia tech es valiosa (usuarios con alto poder adquisitivo, in-market de electrónica), pero el slot BTF con 38% de viewability es un problema serio. <strong>Muchos DSPs con filtro de viewability mínimo del 50% ni siquiera pujarán.</strong> Esto reduce la demanda y presiona el CPM a la baja a pesar del floor de 1,50 €. El publisher tiene aquí un floor mal calibrado para su viewability real — excelente caso de discusión en clase.
+    </div>
+  </div>
+
+  <div class="nota-global">
+    <strong>Contexto de mercado 2025:</strong> open exchange en España opera con CPMs medios de 0,80–1,50 € para inventario generalista. Private marketplace (PMP) mueve 5–15 €. La caída del 30% en CPMs open market reportada en 2025 afecta principalmente al inventario sin señal de audiencia ni contexto diferencial. LetsFamily tiene ventaja estructural por nicho; el medio tech tiene el problema inverso: audiencia valiosa, slot mal posicionado.
+  </div>
+</div>
