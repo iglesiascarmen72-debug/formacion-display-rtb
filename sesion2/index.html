@@ -1,0 +1,796 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ESIC · Display & RTB · Sesión 2 · Publisher Mode</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    /* ── S2 inherits all S1 tokens inline (self-contained for portability) ── */
+    :root {
+      --navy:#0D1F3C; --navy-dark:#08132A; --navy-mid:#1A3058;
+      --esic-red:#C8102E; --esic-red-light:#f9e0e5;
+      --slate:#2B3A55; --silver:#F2F4F7; --white:#ffffff;
+      --accent-s2:#e8a020; --accent-s2-bg:#fffbeb; --accent-s2-border:#fcd34d;
+      --teoria:#1d4ed8; --teoria-bg:#eff6ff;
+      --practica:#0f766e; --practica-bg:#f0fdfa;
+      --reto:#b45309; --reto-bg:#fffbeb;
+      --recurso:#6d28d9; --recurso-bg:#f5f3ff;
+      --ink:#0f172a; --ink-mid:#374151; --muted:#64748b; --line:#e2e8f0;
+      --shadow-sm:0 2px 8px rgba(13,31,60,.08);
+      --shadow:0 8px 28px rgba(13,31,60,.12);
+      --shadow-lg:0 20px 60px rgba(13,31,60,.16);
+      --r-sm:10px; --r:18px; --r-lg:24px;
+      --font:'Inter',ui-sans-serif,system-ui,-apple-system,'Segoe UI',Arial,sans-serif;
+      --mono:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,'Liberation Mono',monospace;
+    }
+    *,*::before,*::after{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;font-family:var(--font);font-size:15px;line-height:1.6;color:var(--ink);background:#eef2f8;}
+    a{color:inherit;} code{font-family:var(--mono);font-size:.88em;background:#eef4fb;border:1px solid var(--line);border-radius:6px;padding:.1em .35em;}
+
+    /* App shell */
+    .app{min-height:100vh;display:flex;flex-direction:column;}
+
+    /* ── Top bar ── */
+    .top{
+      height:68px;background:var(--navy-dark);color:white;
+      display:flex;align-items:center;gap:16px;padding:0 20px;
+      border-bottom:1px solid rgba(255,255,255,.08);
+      position:sticky;top:0;z-index:20;
+    }
+    .top-brand{display:flex;align-items:center;gap:12px;min-width:260px;}
+    .top-brand .esic-text{font-size:20px;font-weight:900;letter-spacing:-1px;}
+    .top-brand .esic-sub{font-size:10px;color:#94a3b8;letter-spacing:2px;text-transform:uppercase;margin-left:2px;}
+    .top-brand-divider{width:1px;height:24px;background:rgba(255,255,255,.15);margin:0 4px;}
+    .top-brand-course{font-size:13px;font-weight:700;color:#e2e8f0;}
+    .top-brand-session{font-size:11px;color:#94a3b8;display:block;margin-top:1px;}
+
+    /* Progress */
+    .top-progress{flex:1;min-width:0;padding:0 8px;}
+    .progress-track{height:5px;background:rgba(255,255,255,.1);border-radius:999px;overflow:hidden;}
+    .progress-fill{height:100%;background:linear-gradient(90deg,var(--esic-red),var(--accent-s2));width:0%;transition:.3s;}
+    .progress-meta{display:flex;justify-content:space-between;font-size:10.5px;color:#94a3b8;margin-top:6px;}
+
+    /* Top actions */
+    .top-actions{display:flex;align-items:center;gap:8px;}
+    .tbtn{
+      border:1px solid rgba(255,255,255,.18);background:transparent;color:white;
+      padding:8px 13px;border-radius:10px;font-weight:700;font-size:12px;
+      text-decoration:none;display:inline-flex;align-items:center;gap:7px;
+      font-family:var(--font);cursor:pointer;transition:background .15s;
+    }
+    .tbtn:hover{background:rgba(255,255,255,.1);}
+    .tbtn.red{background:var(--esic-red);border-color:var(--esic-red);}
+    .tbtn.amber{background:var(--accent-s2);border-color:var(--accent-s2);color:var(--navy-dark);}
+
+    /* ── Layout ── */
+    .layout{display:grid;grid-template-columns:272px 1fr;gap:16px;padding:16px;min-height:calc(100vh - 68px);}
+
+    /* ── Rail (sidebar) ── */
+    .rail{
+      background:rgba(255,255,255,.75);border:1px solid var(--line);border-radius:var(--r);
+      padding:10px;height:calc(100vh - 104px);position:sticky;top:84px;overflow:auto;
+    }
+    .rail-label{font-size:10.5px;font-weight:900;letter-spacing:.09em;color:var(--muted);text-transform:uppercase;margin:6px 8px 10px;}
+    .nav-item{
+      width:100%;display:flex;gap:9px;align-items:flex-start;
+      border:1px solid transparent;background:transparent;border-radius:13px;
+      padding:9px;color:#344054;text-align:left;margin-bottom:3px;
+      font-family:var(--font);cursor:pointer;transition:background .12s;
+    }
+    .nav-item:hover{background:#f8fafc;}
+    .nav-item.active{background:white;border-color:rgba(200,16,46,.3);box-shadow:0 4px 14px rgba(200,16,46,.1);}
+    .nav-num{
+      width:26px;height:26px;border-radius:8px;background:#e5e7eb;
+      display:grid;place-items:center;font-size:11px;font-weight:900;flex:0 0 auto;color:#374151;
+    }
+    .nav-item.active .nav-num{background:var(--esic-red);color:white;}
+    .nav-item b{font-size:12.5px;display:block;line-height:1.2;}
+    .nav-item span{font-size:10.5px;color:var(--muted);display:block;margin-top:2px;}
+
+    /* ── Main content ── */
+    .main{min-width:0;}
+    .screen{display:none;}
+    .screen.active{display:block;}
+
+    /* ── Screen components ── */
+    .hero{display:grid;grid-template-columns:minmax(0,1.6fr) 344px;gap:16px;}
+    .card{background:white;border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden;}
+    .card.pad{padding:24px;}
+    .card.pad-lg{padding:28px 30px;}
+
+    /* Screen head with red accent */
+    .card.screen-card{position:relative;}
+    .card.screen-card::before{
+      content:'';position:absolute;top:0;left:0;right:0;height:4px;
+      background:linear-gradient(90deg,var(--esic-red),#f59e0b);
+    }
+
+    .eyebrow{font-size:11px;font-weight:900;letter-spacing:.09em;text-transform:uppercase;color:var(--esic-red);margin-bottom:8px;}
+    .screen-title{font-size:34px;letter-spacing:-.04em;line-height:1.03;margin:0 0 10px;color:var(--navy);}
+    .screen-subtitle{font-size:16px;line-height:1.55;color:var(--muted);max-width:850px;margin-bottom:0;}
+    .key-idea{margin-top:16px;border-left:4px solid var(--teoria);background:var(--teoria-bg);padding:12px 14px;border-radius:0 12px 12px 0;font-weight:700;color:#1e3a8a;font-size:13.5px;}
+
+    /* Mission panel */
+    .mission-panel{display:flex;flex-direction:column;}
+    .mp-head{padding:16px 18px;border-bottom:1px solid var(--line);background:#fbfcfe;}
+    .mp-head b{font-size:14px;color:var(--navy);}
+    .mp-head p{margin:3px 0 0;color:var(--muted);font-size:12px;}
+    .mp-body{padding:18px;flex:1;}
+    .mp-body ol{margin:0;padding-left:18px;color:#344054;}
+    .mp-body li{margin-bottom:8px;font-size:13.5px;}
+    .sheet-btn{
+      display:flex;align-items:center;justify-content:center;
+      background:var(--navy);color:white;border-radius:999px;
+      padding:11px;font-weight:800;font-size:13px;text-decoration:none;
+      margin:14px 0 10px;box-shadow:0 6px 18px rgba(13,31,60,.22);
+    }
+    .sheet-note{font-size:11.5px;color:var(--muted);line-height:1.5;background:#f8fafc;border:1px dashed var(--line);border-radius:10px;padding:10px;}
+
+    /* Content grid */
+    .content-grid{margin-top:16px;display:grid;grid-template-columns:minmax(0,1fr) 344px;gap:16px;}
+
+    /* Visual card */
+    .visual-card{min-height:400px;position:relative;}
+
+    /* Section text */
+    .section-text{font-size:14.5px;line-height:1.75;color:#344054;white-space:pre-line;}
+
+    /* Tag */
+    .tag{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;border-radius:999px;padding:3px 9px;margin-bottom:10px;}
+    .tag-teoria{background:var(--teoria-bg);color:var(--teoria);border:1px solid #bfdbfe;}
+    .tag-practica{background:var(--practica-bg);color:var(--practica);border:1px solid #99f6e4;}
+    .tag-reto{background:var(--reto-bg);color:var(--reto);border:1px solid var(--accent-s2-border);}
+    .tag-recurso{background:var(--recurso-bg);color:var(--recurso);border:1px solid #ddd6fe;}
+    .tag-profesor{background:#eef2ff;color:#3730a3;border:1px solid #c7d2fe;}
+
+    /* Teacher notes (hidden by default) */
+    .teacher-notes{display:none;margin-top:16px;border:1px solid #c7d2fe;background:#eef2ff;color:#26315e;border-radius:14px;padding:14px 16px;white-space:pre-line;line-height:1.65;font-size:13.5px;}
+    .teacher-notes.show{display:block;}
+
+    /* Footer nav */
+    .footer-nav{display:flex;justify-content:space-between;gap:12px;margin-top:16px;}
+    .fnbtn{
+      display:inline-flex;align-items:center;gap:6px;
+      border:1px solid var(--line);background:white;border-radius:999px;
+      padding:9px 15px;font-weight:700;font-size:13px;color:var(--navy);
+      font-family:var(--font);cursor:pointer;transition:box-shadow .15s,transform .15s;
+    }
+    .fnbtn:hover{box-shadow:var(--shadow-sm);transform:translateY(-1px);}
+    .fnbtn:disabled{opacity:.4;cursor:not-allowed;transform:none;}
+    .fnbtn.primary{background:var(--navy);color:white;border-color:var(--navy);}
+    .fnbtn.primary:hover{box-shadow:0 8px 24px rgba(13,31,60,.22);}
+
+    /* ── Visuals (inline SVG diagrams) ── */
+    .tools-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px;}
+    .tool-card{border:1px solid var(--line);border-radius:14px;padding:14px;background:#fbfcfe;text-align:center;}
+    .tool-card .ico{font-size:24px;margin-bottom:6px;}
+    .tool-card b{display:block;font-size:13px;margin-bottom:3px;}
+    .tool-card p{margin:0;font-size:12px;color:var(--muted);line-height:1.4;}
+    .route{margin-top:18px;display:flex;align-items:center;gap:7px;flex-wrap:wrap;}
+    .route span{background:#f8fafc;border:1px solid var(--line);border-radius:999px;padding:7px 10px;font-size:12px;font-weight:800;}
+    .rule-box{margin-top:18px;background:var(--navy);color:white;border-radius:16px;padding:14px 18px;font-size:15px;font-weight:800;}
+
+    /* Force map (publisher bubbles) */
+    .force-map{display:grid;place-items:center;min-height:360px;background:radial-gradient(circle at center,#f8fbff,white 55%);border-radius:var(--r);position:relative;padding:24px;}
+    .core-node{width:150px;height:150px;border-radius:50%;background:var(--navy);color:white;display:grid;place-items:center;text-align:center;font-size:16px;font-weight:900;box-shadow:0 16px 48px rgba(13,31,60,.22);}
+    .bubble-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px;}
+    .bubble{border:1px solid var(--line);border-radius:14px;padding:12px;background:white;box-shadow:var(--shadow-sm);}
+    .bubble b{font-size:13px;display:block;margin-bottom:3px;color:var(--navy);}
+    .bubble p{font-size:12px;color:var(--muted);line-height:1.4;margin:0;}
+
+    /* GAM map */
+    .gam-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:20px;background:#fbfcfe;border-radius:var(--r);}
+    .gam-center{grid-column:1/4;background:var(--navy);color:white;border-radius:18px;padding:22px;text-align:center;font-size:22px;font-weight:900;margin-bottom:4px;}
+    .gam-module{background:white;border:1px solid var(--line);border-radius:14px;padding:14px;min-height:90px;}
+    .gam-module b{display:block;font-size:13px;color:var(--navy);}
+    .gam-module span{display:block;color:var(--muted);font-size:11.5px;line-height:1.4;margin-top:6px;}
+
+    /* Inventory mockup */
+    .webmock{background:#f8fafc;border:1px solid var(--line);border-radius:16px;padding:14px;}
+    .webbar{height:26px;background:#e5e7eb;border-radius:999px;margin-bottom:12px;}
+    .slot{border:2px dashed var(--teoria);background:var(--teoria-bg);border-radius:12px;display:grid;place-items:center;color:#1d4ed8;font-weight:800;font-size:12px;text-align:center;}
+    .slot.leader{height:70px;}
+    .slot.mpu{height:195px;}
+    .slot.sky{height:290px;}
+    .mock-body{display:grid;grid-template-columns:1fr 200px;gap:14px;margin-top:14px;}
+    .article-lines{display:flex;flex-direction:column;gap:9px;}
+    .line-mock{height:11px;background:#e5e7eb;border-radius:999px;}
+
+    /* Chain */
+    .chain{padding:20px;display:flex;align-items:stretch;gap:10px;justify-content:center;flex-wrap:wrap;}
+    .chain-card{width:200px;border:1px solid var(--line);border-radius:16px;padding:16px;background:white;}
+    .chain-card b{display:block;font-size:17px;color:var(--navy);}
+    .chain-card p{color:var(--muted);font-size:12.5px;line-height:1.4;}
+    .chain-arrow{display:grid;place-items:center;color:var(--teoria);font-size:30px;font-weight:900;}
+    .state-chips{display:flex;flex-wrap:wrap;gap:8px;padding:0 20px 20px;}
+    .state-chip{border-radius:12px;padding:10px 14px;font-size:13px;font-weight:700;}
+    .state-ok{background:#dcfce7;color:#166534;}
+    .state-bad{background:#fee2e2;color:#991b1b;}
+    .state-warn{background:var(--accent-s2-bg);color:#7c4a03;}
+
+    /* Priority pyramid */
+    .priority-layout{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:20px;}
+    .pyramid{display:flex;flex-direction:column;gap:5px;}
+    .tier{padding:15px 18px;border-radius:12px;text-align:center;color:white;font-weight:900;}
+    .tier small{display:block;font-weight:600;opacity:.9;font-size:11px;margin-top:3px;}
+    .t1{background:#4c1d95;}.t2{background:#1d4ed8;}.t3{background:#0f766e;}.t4{background:#b45309;}.t5{background:#374151;}
+    .contest{background:#f8fafc;border:1px solid var(--line);border-radius:16px;padding:16px;}
+    .candidate{background:white;border:1px solid var(--line);border-radius:12px;padding:10px;margin-top:8px;font-size:13px;}
+
+    /* GPT flow */
+    .flow-vert{padding:24px;display:flex;flex-direction:column;align-items:center;gap:8px;}
+    .flowbox{border:1px solid var(--line);background:white;border-radius:12px;padding:12px 16px;min-width:210px;text-align:center;font-weight:700;font-size:13px;}
+    .flowbox small{display:block;color:var(--muted);font-weight:400;font-size:11.5px;margin-top:3px;}
+    .flowdown{font-size:24px;color:var(--teoria);font-weight:900;}
+    .code-block{background:#0b1020;color:#93c5fd;border-radius:16px;padding:18px;margin:20px;font-family:var(--mono);font-size:12px;line-height:1.75;overflow:auto;}
+
+    /* Risk grid */
+    .risk-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:20px;}
+    .risk{border:1px solid var(--line);border-left-width:6px;background:white;border-radius:12px;padding:13px;}
+    .risk.critical{border-left-color:#dc2626;}.risk.important{border-left-color:#f59e0b;}.risk.action{border-left-color:var(--teoria);}
+    .risk label{font-size:10px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;}
+    .risk b{display:block;margin:4px 0;font-size:13px;}
+    .risk p{font-size:12px;line-height:1.45;color:var(--muted);margin:0;}
+
+    /* Perms */
+    .perm-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:20px;}
+    .perm{border-radius:16px;padding:16px;border:1px solid var(--line);background:white;}
+    .perm b{display:block;font-size:13px;color:var(--navy);}
+    .perm p{color:var(--muted);font-size:12.5px;line-height:1.45;margin:4px 0 0;}
+
+    /* Bid matrix */
+    .bid-matrix{padding:20px;display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+    .bid-card{border:1px solid var(--line);border-radius:16px;background:white;padding:16px;}
+    .bid-card h3{margin:0 0 8px;font-size:14px;}
+    .metric{display:flex;justify-content:space-between;border-top:1px solid #eef2f7;padding:7px 0;font-size:12.5px;}
+
+    /* Case canvas */
+    .case-canvas{padding:20px;display:grid;grid-template-columns:repeat(2,1fr);gap:12px;}
+    .case-block{border:1px solid var(--line);border-radius:16px;background:white;padding:16px;min-height:120px;}
+    .case-block b{font-size:16px;display:block;margin-bottom:6px;color:var(--navy);}
+    .case-block p{color:var(--muted);line-height:1.5;font-size:13px;margin:0;}
+
+    /* Triangle / close */
+    .triangle{min-height:380px;display:grid;place-items:center;background:radial-gradient(circle,#fff,#f8fafc);border-radius:var(--r);}
+    .tri-nodes{display:flex;flex-direction:column;gap:12px;align-items:center;width:100%;}
+    .tri-node{background:var(--navy);color:white;border-radius:16px;padding:14px 20px;text-align:center;font-weight:900;width:220px;box-shadow:0 10px 28px rgba(13,31,60,.18);}
+    .tri-node small{display:block;color:#cbd5e1;font-weight:600;font-size:11px;margin-top:4px;}
+    .tri-node.highlight{background:var(--teoria);}
+    .tri-row{display:flex;gap:12px;justify-content:center;}
+
+    /* ── Recap banner (S1 → S2 continuity) ── */
+    .recap-banner{
+      background:linear-gradient(135deg,#0f172a,#1e3a5f);
+      color:white;border-radius:var(--r);padding:18px 22px;
+      margin-bottom:16px;display:flex;align-items:center;gap:14px;
+      border:1px solid rgba(200,16,46,.3);
+    }
+    .recap-icon{width:42px;height:42px;border-radius:11px;background:var(--esic-red);display:grid;place-items:center;font-size:18px;flex-shrink:0;}
+    .recap-text b{display:block;font-size:13.5px;color:#fca5a5;font-weight:800;}
+    .recap-text p{margin:3px 0 0;font-size:12.5px;color:#94a3b8;line-height:1.4;}
+    .recap-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;}
+    .recap-chip{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:999px;padding:4px 10px;font-size:11px;font-weight:700;color:#e2e8f0;}
+
+    /* ── Responsive ── */
+    @media(max-width:1100px){
+      .layout{grid-template-columns:1fr}
+      .rail{position:static;height:auto}
+      .hero,.content-grid{grid-template-columns:1fr}
+      .tools-grid,.gam-grid{grid-template-columns:repeat(2,1fr)}
+      .gam-center{grid-column:auto}
+      .priority-layout,.risk-grid,.bid-matrix,.case-canvas,.perm-grid{grid-template-columns:1fr}
+      .top{height:auto;flex-wrap:wrap;padding:12px}
+      .top-brand{min-width:0}
+      .mock-body{grid-template-columns:1fr}
+      .chain{flex-direction:column;align-items:center}
+    }
+    @media(max-width:700px){
+      .screen-title{font-size:26px}
+      .hero,.content-grid{grid-template-columns:1fr}
+      .tools-grid{grid-template-columns:1fr 1fr}
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ── Top Bar ─────────────────────────────────────────── -->
+  <header class="top">
+    <div class="top-brand">
+      <span class="esic-text">ESIC</span><span class="esic-sub">University</span>
+      <div class="top-brand-divider"></div>
+      <div>
+        <span class="top-brand-course">Display &amp; RTB</span>
+        <span class="top-brand-session">Sesión 2 · Publisher Mode · Google Ad Manager · Yield</span>
+      </div>
+    </div>
+
+    <div class="top-progress">
+      <div class="progress-track"><div class="progress-fill" id="bar"></div></div>
+      <div class="progress-meta">
+        <span id="progressText">Pantalla 00 de 12</span>
+        <span>Web = guía · Sheet = retos y puntuación</span>
+      </div>
+    </div>
+
+    <div class="top-actions">
+      <a class="tbtn amber" id="sheetTop" target="_blank" rel="noopener">📊 Abrir Sheet</a>
+      <button class="tbtn" id="teacherBtn">🔒 Modo profesor</button>
+    </div>
+  </header>
+
+  <div class="layout">
+
+    <!-- ── Rail ───────────────────────────────────────────── -->
+    <aside class="rail">
+      <div class="rail-label">Ruta de misión · S2</div>
+      <nav id="nav"></nav>
+    </aside>
+
+    <!-- ── Main ───────────────────────────────────────────── -->
+    <main class="main" id="main"></main>
+
+  </div>
+</div>
+
+<script>
+const SHEET_URL = 'https://docs.google.com/spreadsheets/d/1XLzYn01JZbAoDiteG8OnqcR79-H0luYkEsI8BVFemmA';
+
+const screens = [
+{n:'00',short:'Bienvenida S2',title:'Bienvenida sábado',subtitle:'El viaje de una impresión publicitaria continúa',idea:'Hoy trabajamos desde el lado del publisher: inventario, GAM, yield y decisiones reales.',tab:'00 · Bienvenida',time:'8 min',visual:'welcome',
+text:`Bienvenidos a la segunda sesión de Display & RTB.
+
+Hoy dejamos de mirar la programática solo desde el lado del anunciante.
+
+Vamos a trabajar desde el lado del publisher: la empresa que tiene contenido, audiencia e inventario publicitario.
+
+La misión del día es entender cómo se organiza, se vende y se protege ese inventario dentro de Google Ad Manager.
+
+Usaremos tres herramientas: la web de misión para saber qué toca hacer en cada momento, el Google Sheet para resolver los retos y ver la puntuación, y ejemplos reales para aprender a detectar decisiones buenas, errores peligrosos y oportunidades de monetización.
+
+No gana quien más términos técnicos diga.
+
+Gana quien mejor observe, razone y explique.`,
+action:['Abrid el Google Sheet de la sesión.','Localizad vuestro grupo.','Revisad la pestaña de inicio.','Comprobad que la puntuación aparece correctamente.'],
+teacher:`Trabajo con campañas, datos, leads y plataformas reales. Por eso he diseñado esta sesión como me habría gustado que me explicaran la programática al principio: viendo el proceso, tocando herramientas y tomando decisiones.\n\nHoy vais a trabajar como si fuerais parte del equipo de monetización de una web. No hace falta saber usar GAM todavía. Lo importante es aprender a mirar los problemas con mentalidad de publisher.`},
+
+{n:'01',short:'Qué quiere un publisher',title:'Qué quiere un publisher',subtitle:'No vende banners: gestiona inventario escaso',idea:'Cada impresión solo ocurre una vez. Si se vende mal, se pierde. Si se sirve mal, molesta. Si se vende sin control, puede dañar la marca.',tab:'01 · Qué quiere un publisher',time:'15 min',visual:'publisher',
+text:`Un publisher es el propietario de una web, una app o un medio digital.
+
+Tiene contenido. Tiene audiencia. Y tiene espacios publicitarios.
+
+Esos espacios son su inventario. Pero el inventario publicitario no es infinito. Cada impresión solo ocurre una vez.
+
+Por eso el publisher no se pregunta solo: "¿Cómo lleno este hueco?"
+
+Se pregunta: "¿A quién se lo vendo, a qué precio, con qué prioridad y con qué nivel de control?"
+
+La dificultad está en que casi todas las decisiones tienen una consecuencia. Subir precios puede mejorar el CPM, pero reducir el fill rate. Añadir más banners puede aumentar ingresos, pero empeorar la experiencia del usuario.
+
+Este equilibrio es la base del yield management.`,
+action:['Leed la lógica del publisher.','Abrid el reto de la pestaña 01.','Tomad la decisión como equipo de publisher.','Volved para la puesta en común.'],
+teacher:`En campañas de Meta o Google Ads solemos mirar desde el lado del comprador. Queremos leads, ventas, tráfico o notoriedad.\n\nHoy cambiamos de silla. Imaginad que sois Xataka, Marca, El País o LetsFamily. Tenéis audiencia y espacios publicitarios. Vuestro problema no es solo venderlos. Vuestro problema es venderlos bien.`},
+
+{n:'02',short:'Mapa GAM',title:'Mapa de Google Ad Manager',subtitle:'El centro de control del inventario publicitario',idea:'GAM no es solo donde se suben banners. Es donde el publisher organiza inventario, campañas, prioridades, demanda, medición y control.',tab:'02 · Mapa de Google Ad Manager',time:'18 min',visual:'gam',
+text:`Google Ad Manager es el ad server del publisher.
+
+Su función no es solo servir anuncios.
+
+GAM ayuda a responder preguntas críticas: qué espacios publicitarios tengo, qué campañas pueden usar esos espacios, qué prioridad tiene cada campaña, qué creatividad se debe mostrar, qué ocurre si una campaña directa no entrega, qué demanda programática puede entrar y qué ingresos, errores o riesgos estoy generando.
+
+Para no perdernos, vamos a mirar GAM como un mapa.
+
+No hace falta memorizar todos los menús. Hace falta entender qué zona del mapa responde a cada problema.`,
+action:['Explorad el mapa general.','Identificad las zonas de GAM.','Abrid el reto 02 en el Sheet.','Usad el mapa para resolverlo.'],
+teacher:`GAM puede parecer complicado porque tiene muchos menús. Pero al principio no hay que aprenderlo como una lista de botones. Hay que aprenderlo como un mapa de problemas.\n\nSi el problema es dónde puede aparecer publicidad, miro inventario. Si el problema es qué campaña tiene derecho a servir, miro entrega. Si el problema es qué pieza se muestra, miro creatividades.`},
+
+{n:'03',short:'Inventario',title:'Inventario y ad units',subtitle:'El mapa de espacios donde puede aparecer publicidad',idea:'Si el inventario está mal definido, todo lo demás empieza mal.',tab:'03 · Inventario y ad units',time:'18 min',visual:'inventory',
+text:`Antes de crear campañas, líneas de pedido o creatividades, el publisher necesita definir su inventario.
+
+En Google Ad Manager, el inventario se organiza mediante ad units. Una ad unit representa un espacio publicitario que puede estar asociado a una sección, una página, una posición o un formato.
+
+Nombrar bien las ad units importa más de lo que parece.
+
+Si el nombre es confuso, el equipo se equivoca. Si el tamaño no está declarado, la creatividad puede no servir. Si una unidad de prueba queda activa en producción, puede generar impresiones sin sentido.
+
+Por eso el inventario es la base de todo el sistema.`,
+action:['Mirad el mockup de inventario.','Identificad slot, tamaño y sección.','Abrid el reto 03 en el Sheet.','Diagnosticad el problema de inventario.'],
+teacher:`Ahora entramos en la primera zona real de GAM: inventario.\n\nAntes de pensar en campañas, creatividades o programática, el publisher tiene que responder a una pregunta básica: ¿dónde puedo servir publicidad?\n\nSi esta capa está mal, todo lo demás se complica.`},
+
+{n:'04',short:'Pedidos y líneas',title:'Pedidos, líneas y creatividades',subtitle:'La cadena que convierte una campaña en un anuncio servido',idea:'Pedido organiza la relación comercial. Línea define condiciones. Creatividad es la pieza que ve el usuario.',tab:'04 · Pedidos, líneas y creatividades',time:'20 min',visual:'chain',
+text:`Una vez definido el inventario, el publisher puede venderlo.
+
+En Google Ad Manager, la venta se organiza en tres niveles principales: pedido, línea de pedido y creatividad.
+
+El pedido suele representar al anunciante, la campaña o el acuerdo comercial.
+
+La línea de pedido define cómo debe entregarse esa campaña: qué inventario puede usar, qué fechas tiene, qué prioridad tiene, qué volumen debe servir, qué precio tiene y qué segmentación aplica.
+
+La creatividad es la pieza publicitaria que se mostrará al usuario.
+
+GAM no decide solo por tener una campaña creada. Necesita que la cadena completa tenga sentido.`,
+action:['Revisad la cadena Pedido → Línea → Creatividad.','Localizad los estados de error.','Abrid el reto 04 en el Sheet.','Decidid en qué nivel está el fallo.'],
+teacher:`Esta es una de las estructuras más importantes de GAM.\n\nUn pedido no sirve anuncios por sí solo. Una línea tampoco sirve si no tiene una creatividad compatible. Y una creatividad no sirve si no está asociada correctamente a una línea.\n\nCuando un anuncio no aparece, muchas veces el error está en esta cadena.`},
+
+{n:'05',short:'Prioridades',title:'Prioridades dentro de GAM',subtitle:'Cuando varias campañas quieren el mismo espacio',idea:'GAM no es una subasta pura. Antes de mirar precio, mira reglas, prioridades y compromisos de entrega.',tab:'05 · Prioridades dentro de GAM',time:'22 min',visual:'priority',
+text:`Imaginad que una página tiene un slot 300x250 disponible.
+
+Varias campañas podrían querer ocuparlo: una campaña directa garantizada, una autopromo, una línea de Price Priority, AdX, AdSense o una campaña House.
+
+La pregunta es: ¿quién gana?
+
+La respuesta no es siempre "quien paga más". En GAM existen prioridades. Algunas campañas tienen entrega garantizada porque el publisher se ha comprometido a servir un volumen o una presencia concreta. Otras campañas son de relleno o backfill.
+
+Por eso entender las prioridades es clave para no bloquear inventario premium, no regalar impresiones y no dejar espacios en blanco.`,
+action:['Mirad la pirámide de prioridades.','Revisad los candidatos al slot.','Abrid el reto 05 en el Sheet.','Resolved el conflicto de prioridad.'],
+teacher:`Ahora aparece el conflicto real: varias campañas pueden querer el mismo espacio y GAM tiene que decidir.\n\nLo importante es entender que GAM no funciona como una subasta abierta en todos los casos. Primero respeta prioridades, compromisos y reglas de entrega.\n\nA veces el problema no es que no haya demanda. El problema es que hemos puesto por delante una línea que no debería estar por delante.`},
+
+{n:'06',short:'Tags GPT',title:'Tags GPT y anuncio en blanco',subtitle:'Cuando la web llama a GAM… y no vuelve ningún anuncio',idea:'Un slot en la web necesita una llamada correcta a GAM. Si la ad unit, el tamaño o la configuración fallan, puede quedar en blanco.',tab:'06 · Tags GPT y anuncio en blanco',time:'22 min',visual:'gpt',
+text:`Una vez que el inventario existe en Google Ad Manager, la web necesita llamar a ese inventario.
+
+Esa llamada se hace mediante Google Publisher Tag, normalmente abreviado como GPT.
+
+El tag GPT le dice a GAM qué ad unit se está solicitando, en qué div de la página debe servirse, qué tamaños acepta, qué página está cargando el usuario y cuándo debe mostrarse el anuncio.
+
+Si todo encaja, GAM puede devolver una creatividad. Pero si algo falla, el slot puede quedarse vacío.
+
+El anuncio en blanco no es un misterio. Es una pista.`,
+action:['Revisad la llamada GPT.','Identificad ad unit, tamaño y div.','Abrid el reto 06 en el Sheet.','Diagnosticad por qué el slot queda vacío.'],
+teacher:`GAM no sirve anuncios si la web no le llama. El tag GPT es como decirle a GAM: tengo este hueco, con este tamaño, en esta página. ¿Tienes algo para servir aquí?\n\nLo importante aquí no es aprender programación. Lo importante es aprender a diagnosticar.`},
+
+{n:'07',short:'Backfill',title:'Backfill, AdX, AdSense y Yield Group',subtitle:'Qué ocurre cuando nadie ha reservado ese espacio',idea:'El backfill evita que el inventario quede vacío. Pero si está mal configurado, el publisher pierde ingresos.',tab:'07 · Backfill, AdX, AdSense y Yield Group',time:'22 min',visual:'backfill',
+text:`Un publisher no siempre tiene una campaña directa preparada para cada impresión.
+
+Puede ocurrir que una línea no entregue, que una sección no tenga patrocinio activo, que una creatividad no sea compatible o que el usuario no cumpla la segmentación de ninguna campaña.
+
+En esos casos, el publisher necesita una segunda vía para monetizar la impresión. A eso lo llamamos backfill.
+
+El backfill permite que entren fuentes de demanda como AdX, AdSense u otros partners de rendimiento.
+
+Pero el backfill no es automático por arte de magia. Hay que configurarlo bien.`,
+action:['Seguid el flujo de backfill.','Pensad qué pasa si no hay campaña directa.','Abrid el reto 07 en el Sheet.','Analizad la fuente de demanda alternativa.'],
+teacher:`En un mundo ideal, todo el inventario estaría vendido a campañas directas premium. Pero en la realidad eso no pasa.\n\nEl backfill evita que esas impresiones se pierdan. Pero cuidado: backfill no significa vender a cualquier precio. Un buen yield manager quiere rellenar inventario y proteger su valor.`},
+
+{n:'08',short:'Auditoría GAM',title:'Auditoría GAM: errores reales',subtitle:'Cuando una mala configuración cuesta dinero y control',idea:'Muchos errores no se ven desde fuera, pero pueden provocar pérdida de ingresos, anuncios en blanco, reporting confuso o riesgos de seguridad.',tab:'08 · Auditoría GAM: errores reales',time:'25 min',visual:'audit',
+text:`Ahora vamos a cambiar de modo.
+
+Hasta este punto hemos aprendido la lógica de GAM: inventario, pedidos, líneas, creatividades, prioridades, tags y backfill.
+
+Ahora vamos a usar esa lógica para leer una auditoría real.
+
+Una auditoría GAM no consiste en mirar si "hay campañas". Consiste en detectar riesgos: riesgos de ingresos, de entrega, de seguridad y de configuración.
+
+El objetivo de esta pantalla es aprender a priorizar: qué es crítico, qué es importante, qué puede esperar y qué acción tomaríamos primero.`,
+action:['Revisad el panel de hallazgos.','Diferenciad crítico, importante y acción.','Abrid el reto 08 en el Sheet.','Priorizad como responsables de red.'],
+teacher:`En una red real, las cosas no siempre están ordenadas. Puede haber usuarios antiguos, líneas activas sin creatividad, secciones sin backfill, floors sin configurar o nombres heredados que nadie entiende.\n\nEl trabajo profesional no es solo detectar el fallo. Es priorizar.`},
+
+{n:'09',short:'Gobernanza',title:'Seguridad y gobernanza',subtitle:'Quién puede tocar la red también afecta al revenue',idea:'Una mala configuración puede hacer perder dinero. Un mal permiso puede hacer perder el control.',tab:'09 · Seguridad y gobernanza',time:'18 min',visual:'security',
+text:`Google Ad Manager no solo sirve anuncios.
+
+También controla quién puede cambiar la configuración de una red publicitaria.
+
+Eso incluye inventario, líneas de pedido, creatividades, usuarios, partners, reglas de precio, Yield Groups y reporting.
+
+Por eso la seguridad en GAM no es un tema técnico secundario. Es gobernanza de negocio.
+
+Cuando auditamos una red, no miramos solo si los anuncios sirven. También miramos quién puede tomar decisiones dentro del sistema.
+
+Porque controlar el inventario empieza por controlar los accesos.`,
+action:['Revisad el mapa de permisos.','Identificad accesos de alto riesgo.','Abrid el reto 09 en el Sheet.','Decidid qué acceso revisaríais primero.'],
+teacher:`Esta pantalla es menos vistosa que una subasta RTB, pero es igual o más importante.\n\nEn una red real, los errores no siempre vienen de la tecnología. A veces vienen de accesos que nadie revisó.\n\nLa gobernanza no es burocracia. Es asegurarse de que solo las personas correctas pueden tomar decisiones críticas dentro de GAM.`},
+
+{n:'10',short:'Trading desk',title:'Cómo piensa un trading desk',subtitle:'El comprador no quiere cualquier impresión',idea:'El publisher ve inventario. El trading desk ve oportunidades de compra.',tab:'10 · Cómo piensa un trading desk',time:'22 min',visual:'trading',
+text:`Ahora cambiamos de lado.
+
+Hasta este punto hemos pensado como publisher. Pero al otro lado hay un comprador.
+
+Un trading desk no compra "un banner" sin más. Compra una oportunidad de impacto.
+
+Antes de pujar, se pregunta quién es el usuario, en qué contexto aparece la impresión, qué formato está disponible, qué viewability espera, qué precio tiene sentido pagar, si el dominio es seguro para la marca y si esa impresión ayuda al objetivo de campaña.
+
+Por eso dos impresiones del mismo tamaño pueden valer distinto.`,
+action:['Mirad las oportunidades de impresión.','Comparad contexto, CPM y viewability.','Abrid el reto 10 en el Sheet.','Decidid como trading desk.'],
+teacher:`Un trading desk no debería pensar "quiero banners baratos". Debería pensar qué impresión tiene más probabilidad de ayudar al objetivo del anunciante.\n\nUna impresión barata en un mal contexto puede salir cara. Una impresión más cara en un contexto muy cualificado puede ser una buena compra.`},
+
+{n:'11',short:'Caso PlayStation',title:'Caso PlayStation / Xataka',subtitle:'Cuando contexto, audiencia e inventario encajan',idea:'Una buena compra programática empieza por la relación entre marca, contexto, audiencia e inventario.',tab:'11 · Caso PlayStation / Xataka',time:'28 min',visual:'case',
+text:`Imaginad una campaña de PlayStation para promocionar un lanzamiento, una consola, un videojuego o una oferta especial.
+
+Ahora imaginad un medio como Xataka. Tiene contenido tecnológico, lectores interesados en gadgets, gaming, electrónica de consumo e innovación, formatos display visibles e inventario contextual con mucha afinidad.
+
+Desde el punto de vista del anunciante, la pregunta sería: ¿merece la pena pagar más por aparecer en un contexto donde la audiencia ya está cerca del producto?
+
+Desde el punto de vista del publisher, la pregunta sería: ¿cómo puedo vender este inventario sin regalarlo, protegiendo su valor y ofreciendo una oportunidad atractiva al comprador?`,
+action:['Analizad el canvas del caso.','Mirad buyer view y publisher view.','Abrid el caso 11 en el Sheet.','Justificad vuestra decisión con criterios profesionales.'],
+teacher:`Este caso es interesante porque ya no hablamos de conceptos aislados. Aquí aparece todo junto: anunciante, objetivo, contexto editorial, audiencia, inventario, precio, decisión de compra y decisión de monetización.\n\nDesde PlayStation, Xataka puede ser interesante porque el contexto y la audiencia tienen afinidad. Desde Xataka, PlayStation puede justificar un mejor valor de inventario.`},
+
+{n:'12',short:'Cierre S2',title:'Cierre',subtitle:'Publisher, buyer y yield manager: tres miradas sobre la misma impresión',idea:'Una impresión publicitaria tiene valor porque alguien la genera, alguien la compra y alguien decide cómo monetizarla.',tab:'12 · Cierre',time:'15 min',visual:'close',
+text:`Hemos seguido el recorrido de una impresión desde el lado del publisher.
+
+Primero entendimos que una web no vende "banners sueltos". Gestiona inventario.
+
+Después vimos que ese inventario necesita estructura: ad units, pedidos, líneas, creatividades, prioridades, tags, backfill, seguridad y reporting.
+
+También vimos que el comprador no busca cualquier hueco. Busca oportunidades de impacto que encajen con su objetivo, su audiencia, su contexto y su precio máximo.
+
+En medio aparece una figura clave: el yield manager.
+
+La programática no elimina la estrategia. La hace más rápida, más granular y más exigente.`,
+action:['Revisad la puntuación final en el Sheet.','Preparad una conclusión breve.','Explicad qué error os pareció más crítico.','Cerrad la misión con la mirada profesional.'],
+teacher:`La programática no es solo que una máquina compre banners. Es un sistema donde una impresión se evalúa desde varios lados al mismo tiempo.\n\nEl publisher piensa en inventario, ingresos, control y experiencia. El buyer piensa en objetivo, audiencia, contexto, precio y riesgo. Y el yield manager intenta equilibrar todo eso.\n\nA partir de ahora, cuando veáis un banner, no penséis solo en la creatividad. Preguntad qué decisión hubo detrás.`}
+];
+
+function visual(type) {
+  if (type === 'welcome') return `<div class="card visual-card pad">
+    <div class="eyebrow">Misión del día</div>
+    <div style="font-size:28px;font-weight:900;color:var(--navy);letter-spacing:-.03em;margin:0 0 16px;line-height:1.1">Monetizar una web sin perder el control del inventario.</div>
+    <div class="route"><span>Publisher</span><span>→</span><span>Inventario</span><span>→</span><span>GAM</span><span>→</span><span>Prioridades</span><span>→</span><span>Backfill</span><span>→</span><span>Auditoría</span><span>→</span><span>Trading desk</span><span>→</span><span>Caso final</span></div>
+    <div class="tools-grid" style="margin-top:20px">
+      <div class="tool-card"><div class="ico">🧭</div><b>Web</b><p>Guía de misión.</p></div>
+      <div class="tool-card"><div class="ico">🕹️</div><b>GAM</b><p>Centro de control.</p></div>
+      <div class="tool-card"><div class="ico">📊</div><b>Sheet</b><p>Retos y puntos.</p></div>
+      <div class="tool-card"><div class="ico">🔎</div><b>DevTools</b><p>Evidencias reales.</p></div>
+    </div>
+    <div class="rule-box">Regla de oro: gana quien mejor observa, decide y explica.</div>
+  </div>`;
+
+  if (type === 'publisher') return `<div class="card visual-card pad">
+    <div style="display:flex;justify-content:center;margin-bottom:20px">
+      <div class="core-node">PUBLISHER</div>
+    </div>
+    <div class="bubble-grid">
+      <div class="bubble"><b>Ingresos</b><p>¿Cuánto dinero genera cada impresión?</p></div>
+      <div class="bubble"><b>Control de marca</b><p>¿Qué categorías o anunciantes permito?</p></div>
+      <div class="bubble"><b>Fill rate</b><p>¿Qué porcentaje consigo llenar?</p></div>
+      <div class="bubble"><b>Experiencia de usuario</b><p>¿Cuánta presión publicitaria aguanta la página?</p></div>
+      <div class="bubble" style="grid-column:1/-1"><b>Valor del inventario</b><p>¿Estoy vendiendo barato algo premium?</p></div>
+    </div>
+  </div>`;
+
+  if (type === 'gam') return `<div class="card visual-card">
+    <div class="gam-grid">
+      <div class="gam-center">GOOGLE AD MANAGER</div>
+      ${[['Inventario','Ad units · tamaños · secciones · placements'],['Entrega','Pedidos · líneas · fechas · objetivos'],['Creatividades','Banners · HTML5 · assets · asignación'],['Prioridades','Sponsorship · Standard · Price Priority · House'],['Programática / Yield','AdX · AdSense · Yield Groups · Backfill · Floors'],['Informes','Impresiones · clics · revenue · fill rate'],['Administración','Usuarios · permisos · red · seguridad']].map(x=>`<div class="gam-module"><b>${x[0]}</b><span>${x[1]}</span></div>`).join('')}
+    </div>
+  </div>`;
+
+  if (type === 'inventory') return `<div class="card visual-card">
+    <div class="webmock" style="margin:20px">
+      <div class="webbar"></div>
+      <div class="slot leader">970x250 · Home superior</div>
+      <div class="mock-body">
+        <div class="article-lines">
+          <div class="line-mock"></div><div class="line-mock" style="width:80%"></div>
+          <div class="line-mock" style="width:92%"></div>
+          <div class="slot mpu">300x250 · MPU artículo</div>
+          <div class="line-mock"></div><div class="line-mock" style="width:76%"></div>
+        </div>
+        <div class="slot sky">300x600 · Robapáginas</div>
+      </div>
+    </div>
+    <div class="code-block" style="margin:0 20px 20px;font-size:11.5px">Ad unit: /letsfamily/embarazo/articulo_300x250
+Tamaño: 300x250
+Sección: Embarazo
+Estado: Activa</div>
+  </div>`;
+
+  if (type === 'chain') return `<div class="card visual-card">
+    <div class="chain">
+      <div class="chain-card"><b>Pedido</b><p>Weleda · Mayo 2026<br>Relación comercial / campaña</p></div>
+      <div class="chain-arrow">→</div>
+      <div class="chain-card"><b>Línea</b><p>Embarazo · 300x250<br>Fechas, prioridad, inventario, precio</p></div>
+      <div class="chain-arrow">→</div>
+      <div class="chain-card"><b>Creatividad</b><p>Banner HTML5 · 300x250<br>Pieza que verá el usuario</p></div>
+    </div>
+    <div class="state-chips">
+      <div class="state-chip state-ok">✓ Cadena correcta</div>
+      <div class="state-chip state-bad">✗ Sin creatividad</div>
+      <div class="state-chip state-warn">⚠ Tamaño incompatible</div>
+      <div class="state-chip state-warn">⚠ Inventario mal asignado</div>
+    </div>
+  </div>`;
+
+  if (type === 'priority') return `<div class="card visual-card">
+    <div class="priority-layout">
+      <div class="pyramid">
+        <div class="tier t1">Sponsorship<small>Máxima prioridad</small></div>
+        <div class="tier t2">Standard<small>Entrega garantizada</small></div>
+        <div class="tier t3">Price Priority / Network<small>No garantizada</small></div>
+        <div class="tier t4">AdX / AdSense / Backfill<small>Demanda alternativa</small></div>
+        <div class="tier t5">House<small>Autopromo / relleno interno</small></div>
+      </div>
+      <div class="contest">
+        <div style="font-weight:800;font-size:14px;margin-bottom:8px">Slot: 300x250 · Embarazo</div>
+        <div class="candidate">Weleda Sponsorship</div>
+        <div class="candidate">Autopromo LetsFamily</div>
+        <div class="candidate">AdX puja CPM 1,80 €</div>
+        <div class="candidate">House campaña interna</div>
+      </div>
+    </div>
+  </div>`;
+
+  if (type === 'gpt') return `<div class="card visual-card">
+    <div class="flow-vert">
+      <div class="flowbox">Página web<small>Slot 300x250 vacío</small></div>
+      <div class="flowdown">↓ GPT call</div>
+      <div class="flowbox">Google Ad Manager<small>¿ad unit? ¿tamaño? ¿línea? ¿creativa?</small></div>
+      <div class="flowdown">↓</div>
+      <div style="display:flex;gap:12px">
+        <div class="flowbox" style="background:#dcfce7;border-color:#86efac">✓ Anuncio servido</div>
+        <div class="flowbox" style="background:#fee2e2;border-color:#fca5a5">✗ Slot vacío</div>
+      </div>
+    </div>
+    <div class="code-block" style="margin:0 20px 20px;font-size:11.5px">googletag.defineSlot(
+  '/22908118888/bloque_inventado',
+  [300, 250],
+  'div-gpt-ad-misterio'
+);</div>
+  </div>`;
+
+  if (type === 'backfill') return `<div class="card visual-card">
+    <div class="flow-vert">
+      <div class="flowbox">Slot disponible</div>
+      <div class="flowdown">↓</div>
+      <div class="flowbox">¿Campaña directa elegible?</div>
+      <div class="flowdown">↓</div>
+      <div style="display:flex;gap:12px">
+        <div class="flowbox" style="background:#dcfce7;border-color:#86efac">Sí → Sirve directa</div>
+        <div class="flowbox" style="background:#fffbeb;border-color:#fcd34d">No → Backfill</div>
+      </div>
+      <div class="flowdown">↓</div>
+      <div class="flowbox">Yield Group</div>
+      <div class="flowdown">↓</div>
+      <div style="display:flex;gap:12px">
+        <div class="flowbox">AdX</div><div class="flowbox">AdSense</div>
+      </div>
+    </div>
+  </div>`;
+
+  if (type === 'audit') return `<div class="card visual-card">
+    <div class="risk-grid">
+      ${[['critical','CRÍTICO','Usuarios externos con acceso administrador','Riesgo de control de red.'],
+         ['critical','CRÍTICO','Floor price sin configurar','Revenue vendido demasiado barato.'],
+         ['critical','CRÍTICO','Secciones excluidas del Yield Group','Impresiones sin backfill.'],
+         ['important','IMPORTANTE','Line items sin creatividad','Campañas activas que no entregan bien.'],
+         ['important','IMPORTANTE','Nomenclatura inconsistente','Errores de operación y reporting.'],
+         ['action','ACCIÓN','Line items finalizados sin archivar','Ruido operativo.']
+       ].map(r=>`<div class="risk ${r[0]}"><label>${r[1]}</label><b>${r[2]}</b><p>${r[3]}</p></div>`).join('')}
+    </div>
+  </div>`;
+
+  if (type === 'security') return `<div class="card visual-card">
+    <div class="perm-grid">
+      ${[['Administrador','Puede cambiar casi todo. Riesgo alto si es externo o antiguo.'],
+         ['Trafficker / Ad Ops','Gestiona campañas, líneas y creatividades. Riesgo operativo.'],
+         ['Reporting','Consulta datos. Riesgo bajo si está bien limitado.'],
+         ['Service account / API','Opera de forma programática. Riesgo invisible si no se audita.']
+       ].map(x=>`<div class="perm"><b>${x[0]}</b><p>${x[1]}</p></div>`).join('')}
+      <div class="risk critical" style="grid-column:1/-1"><label>Hallazgo real</label><b>Usuarios externos con acceso administrador</b><p>Controlar el inventario empieza por controlar los accesos.</p></div>
+    </div>
+  </div>`;
+
+  if (type === 'trading') return `<div class="card visual-card">
+    <div class="bid-matrix">
+      ${[['Impresión A','Medio generalista · 300x250','0,80 €','55%','Audiencia amplia'],
+         ['Impresión B','LetsFamily · embarazo · 300x250','1,20 €','60%','Maternidad'],
+         ['Impresión C','Medio tech · review móviles · 728x90 BTF','1,50 €','38%','Tech / baja viewability']
+       ].map(x=>`<div class="bid-card"><h3>${x[0]}</h3><p style="color:var(--muted);font-size:12px;margin:0 0 10px">${x[1]}</p><div class="metric"><span>Floor</span><b>${x[2]}</b></div><div class="metric"><span>Viewability</span><b>${x[3]}</b></div><div class="metric"><span>Contexto</span><b>${x[4]}</b></div></div>`).join('')}
+    </div>
+  </div>`;
+
+  if (type === 'case') return `<div class="card visual-card">
+    <div class="case-canvas">
+      ${[['Marca','PlayStation / marca gaming premium'],
+         ['Objetivo','Notoriedad, lanzamiento o tráfico cualificado'],
+         ['Medio','Xataka / medio tecnológico'],
+         ['Inventario','Display ATF, contexto tech/gaming, PMP o deal'],
+         ['Buyer view','¿Esta impresión ayuda al objetivo?'],
+         ['Publisher view','¿Estoy vendiendo este contexto a su valor real?']
+       ].map(x=>`<div class="case-block"><b>${x[0]}</b><p>${x[1]}</p></div>`).join('')}
+    </div>
+  </div>`;
+
+  // close / triangle
+  return `<div class="card visual-card triangle">
+    <div style="width:100%;padding:24px">
+      <div class="tri-row" style="margin-bottom:12px"><div class="tri-node">Impresión<small>Una decisión en milisegundos</small></div></div>
+      <div class="tri-row">
+        <div class="tri-node">Publisher<small>Inventario · control · UX</small></div>
+        <div class="tri-node highlight">Yield Manager<small>Equilibrio · revenue · fill rate</small></div>
+        <div class="tri-node">Buyer<small>Objetivo · audiencia · precio</small></div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function recapBanner() {
+  return `<div class="recap-banner">
+    <div class="recap-icon">🔁</div>
+    <div class="recap-text">
+      <b>Viernes: seguisteis el viaje. Hoy: vais a gestionarlo.</b>
+      <p>Sesión 1 cubrió: inventario · slot · ad call · Header Bidding · subasta RTB · viewability. Hoy empezamos desde el lado del publisher con Google Ad Manager.</p>
+      <div class="recap-chips">
+        <span>Slot ✓</span><span>Ad call ✓</span><span>Header Bidding ✓</span>
+        <span>Subasta RTB ✓</span><span>Floor price ✓</span><span>Viewability ✓</span>
+      </div>
+    </div>
+  </div>`;
+}
+
+function screenHTML(s, i) {
+  const isFirst = i === 0;
+  return `<section class="screen" id="screen-${i}">
+    ${isFirst ? recapBanner() : ''}
+    <div class="hero">
+      <div class="card screen-card pad-lg">
+        <div class="eyebrow">${s.n} · ${s.time}</div>
+        <h1 class="screen-title">${s.subtitle}</h1>
+        <p class="screen-subtitle">${s.idea}</p>
+        <div class="key-idea">La web guía. El reto y la puntuación están en el Google Sheet.</div>
+      </div>
+      <div class="card mission-panel">
+        <div class="mp-head"><b>Reto activo</b><p>Pestaña: ${s.tab}</p></div>
+        <div class="mp-body">
+          <ol>${s.action.map(a=>`<li>${a}</li>`).join('')}</ol>
+          <a href="${SHEET_URL}" target="_blank" rel="noopener" class="sheet-btn">📊 Abrir reto ${s.n} en Google Sheet</a>
+          <div class="sheet-note">No respondáis en la web. La respuesta y la puntuación viven en el Sheet.</div>
+        </div>
+      </div>
+    </div>
+    <div class="content-grid">
+      ${visual(s.visual)}
+      <div class="card pad">
+        <span class="tag tag-teoria">Para el alumno</span>
+        <div class="section-text">${s.text}</div>
+        <div class="teacher-notes">${s.teacher}</div>
+      </div>
+    </div>
+    <div class="footer-nav">
+      <button class="fnbtn" onclick="go(${i-1})" ${i===0?'disabled':''}>← Anterior</button>
+      <button class="fnbtn primary" onclick="go(${i+1})" ${i===screens.length-1?'disabled':''}>Continuar misión →</button>
+    </div>
+  </section>`;
+}
+
+// Build nav and screens
+const nav = document.getElementById('nav');
+const main = document.getElementById('main');
+nav.innerHTML = screens.map((s,i) => `<button class="nav-item" onclick="go(${i})" id="nav-${i}"><span class="nav-num">${s.n}</span><div><b>${s.title}</b><span>${s.short}</span></div></button>`).join('');
+main.innerHTML = screens.map(screenHTML).join('');
+document.getElementById('sheetTop').href = SHEET_URL;
+
+let current = 0, teacherMode = false;
+
+function go(i) {
+  if (i < 0 || i >= screens.length) return;
+  current = i;
+  document.querySelectorAll('.screen').forEach(x => x.classList.remove('active'));
+  document.getElementById('screen-' + i).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(x => x.classList.remove('active'));
+  document.getElementById('nav-' + i).classList.add('active');
+  const pct = (i / (screens.length - 1)) * 100;
+  document.getElementById('bar').style.width = pct + '%';
+  document.getElementById('progressText').textContent = `Pantalla ${screens[i].n} · ${screens[i].title}`;
+  applyTeacher();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function applyTeacher() {
+  document.querySelectorAll('.teacher-notes').forEach(x => x.classList.toggle('show', teacherMode));
+  document.getElementById('teacherBtn').textContent = teacherMode ? '👁 Ocultar profesor' : '🔒 Modo profesor';
+}
+
+document.getElementById('teacherBtn').addEventListener('click', () => { teacherMode = !teacherMode; applyTeacher(); });
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight') go(current + 1);
+  if (e.key === 'ArrowLeft')  go(current - 1);
+  if (e.key.toLowerCase() === 'p') { teacherMode = !teacherMode; applyTeacher(); }
+});
+
+go(0);
+</script>
+</body>
+</html>
