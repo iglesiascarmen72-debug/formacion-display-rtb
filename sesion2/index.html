@@ -293,9 +293,37 @@
       .hero,.content-grid{grid-template-columns:1fr}
       .tools-grid{grid-template-columns:1fr 1fr}
     }
+
+    /* ── Password overlay (igual que S1) ── */
+    .overlay{position:fixed;inset:0;background:rgba(8,19,42,.94);display:none;z-index:100;place-items:center;padding:20px;}
+    .overlay.show{display:grid;}
+    .login{background:white;border-radius:var(--r-lg);padding:32px;max-width:420px;width:100%;box-shadow:var(--shadow-lg);}
+    .login-esic{font-size:22px;font-weight:900;letter-spacing:-1px;color:var(--navy);margin-bottom:20px;display:block;}
+    .login h2{margin:0 0 8px;color:var(--navy);font-size:22px;}
+    .login p{color:var(--muted);margin:0 0 20px;font-size:14px;}
+    .login input{width:100%;border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:8px 0;font-size:15px;font-family:var(--font);outline:none;transition:border-color .15s;}
+    .login input:focus{border-color:var(--esic-red);}
+    .login-btn{width:100%;border:none;cursor:pointer;background:var(--navy);color:white;border-radius:999px;padding:12px;font-size:15px;font-weight:800;font-family:var(--font);margin-top:12px;}
+    .login-btn:hover{background:var(--navy-mid);}
+    .login-err{color:var(--esic-red);font-size:13px;min-height:20px;margin-top:6px;}
+    .login-note{font-size:12px;color:#94a3b8;margin-top:12px;}
   </style>
 </head>
 <body>
+
+<!-- ── Password overlay ── -->
+<div class="overlay" id="overlay">
+  <div class="login">
+    <span class="login-esic">ESIC <span style="font-size:11px;font-weight:400;color:#94a3b8;letter-spacing:2px;text-transform:uppercase">University</span></span>
+    <h2>Modo Profesor</h2>
+    <p>Introduce la clave para ver las notas docentes y la guía de sesión.</p>
+    <input id="pass" type="password" placeholder="Clave de acceso">
+    <button class="login-btn" id="unlock">Acceder →</button>
+    <p class="login-err" id="err"></p>
+    <p class="login-note">Protección básica para uso en clase. Clave: esic2026</p>
+  </div>
+</div>
+
 <div class="app">
 
   <!-- ── Top Bar ─────────────────────────────────────────── -->
@@ -318,6 +346,7 @@
     </div>
 
     <div class="top-actions">
+      <a class="tbtn" href="../" style="border-color:rgba(255,255,255,.25)">← Sesión 1</a>
       <a class="tbtn amber" id="sheetTop" target="_blank" rel="noopener">📊 Abrir Sheet</a>
       <button class="tbtn" id="teacherBtn">🔒 Modo profesor</button>
     </div>
@@ -783,11 +812,56 @@ function applyTeacher() {
   document.getElementById('teacherBtn').textContent = teacherMode ? '👁 Ocultar profesor' : '🔒 Modo profesor';
 }
 
-document.getElementById('teacherBtn').addEventListener('click', () => { teacherMode = !teacherMode; applyTeacher(); });
+// ── Password protection (igual que S1) ──
+const overlay = document.getElementById('overlay');
+const passInput = document.getElementById('pass');
+const unlockBtn = document.getElementById('unlock');
+const errMsg = document.getElementById('err');
+
+if (sessionStorage.getItem('esic_profesor_ok') !== '1') {
+  // overlay solo se muestra al pulsar el botón, no al cargar
+}
+
+function unlock() {
+  const PASSWORD = 'esic2026';
+  if (passInput.value === PASSWORD) {
+    sessionStorage.setItem('esic_profesor_ok', '1');
+    overlay.classList.remove('show');
+    teacherMode = true;
+    applyTeacher();
+  } else {
+    errMsg.textContent = 'Clave incorrecta.';
+    passInput.focus();
+  }
+}
+unlockBtn.addEventListener('click', unlock);
+passInput.addEventListener('keydown', e => { if (e.key === 'Enter') unlock(); });
+
+document.getElementById('teacherBtn').addEventListener('click', () => {
+  if (teacherMode) {
+    // Si ya está activo, lo desactiva directamente
+    teacherMode = false;
+    applyTeacher();
+  } else if (sessionStorage.getItem('esic_profesor_ok') === '1') {
+    // Ya autenticado en esta sesión, activa directamente
+    teacherMode = true;
+    applyTeacher();
+  } else {
+    // Muestra el overlay de contraseña
+    passInput.value = '';
+    errMsg.textContent = '';
+    overlay.classList.add('show');
+    setTimeout(() => passInput.focus(), 100);
+  }
+});
+
 document.addEventListener('keydown', e => {
   if (e.key === 'ArrowRight') go(current + 1);
   if (e.key === 'ArrowLeft')  go(current - 1);
-  if (e.key.toLowerCase() === 'p') { teacherMode = !teacherMode; applyTeacher(); }
+  if (e.key === 'Escape') overlay.classList.remove('show');
+  if (e.key.toLowerCase() === 'p' && !overlay.classList.contains('show')) {
+    document.getElementById('teacherBtn').click();
+  }
 });
 
 go(0);
