@@ -36,7 +36,18 @@
     .result-body{padding:24px;display:grid;gap:20px}.summary{font-size:16px;color:#344054;background:#F8FAFC;border-left:4px solid var(--esic-2);padding:16px 18px;border-radius:0 14px 14px 0}.summary p{margin:0 0 8px}.summary p:last-child{margin:0}.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.param{border:1px solid #EAECF0;background:#fff;border-radius:14px;padding:14px;min-height:92px}.param .k{font-size:11px;color:#667085;font-weight:800;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}.param .v{font-size:15px;color:#101828;font-weight:750;word-break:break-word}.param .v.mono{font-family:var(--mono);font-size:12px;font-weight:600}
     .devtools{background:#07172F;color:#EAF3FF;border-radius:18px;padding:20px}.devtools h3,.curiosity h3,.evidence h3{margin:0 0 12px;font-size:16px}.search-list{display:flex;flex-wrap:wrap;gap:8px}.pill{font-family:var(--mono);font-size:12px;padding:7px 10px;border-radius:999px;background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.13);color:#EAF3FF}.curiosity{background:var(--purple-soft);border:1px solid #E9D7FE;border-radius:18px;padding:20px}.curiosity p{margin:0;color:#42307D}.evidence{background:#FCFCFD;border:1px dashed #D0D5DD;border-radius:18px;padding:20px}.evidence ul{margin:0;padding-left:20px;color:#475467}.evidence li{margin:5px 0}.raw-toggle{margin-top:6px}.raw{display:none;background:#0B1220;color:#D7E4FF;border-radius:14px;padding:14px;font-family:var(--mono);font-size:12px;white-space:pre-wrap;overflow:auto;max-height:220px}.raw.show{display:block}
     .empty{padding:42px;text-align:center;color:#667085}.empty .big{font-size:38px;margin-bottom:8px}.helper{background:#FFF8E8;border:1px solid #FEC84B;border-radius:var(--r);padding:18px;color:#7A4A00}.helper h3{margin:0 0 8px;font-size:15px}.helper p{margin:0;font-size:13px}.footnote{margin-top:18px;color:#667085;font-size:12px;text-align:center}
-    @media(max-width:980px){.hero,.main{grid-template-columns:1fr}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.result-head{grid-template-columns:1fr}.level{justify-self:start}}
+
+    .translation{border:1px solid #D9E8FF;background:linear-gradient(180deg,#F8FBFF,#FFFFFF);border-radius:18px;padding:20px}
+    .translation h3{margin:0 0 14px;font-size:18px;color:#07172F}
+    .translation-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+    .tcard{border:1px solid #EAECF0;background:#fff;border-radius:14px;padding:15px}
+    .tcard .q{font-size:12px;color:#004B93;font-weight:800;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px}
+    .tcard .ans{font-size:17px;color:#101828;font-weight:800;word-break:break-word}
+    .tcard .ans.mono{font-family:var(--mono);font-size:13px;font-weight:700}
+    .tcard .note{margin-top:6px;font-size:13px;color:#667085;line-height:1.45}
+    .meaning{margin-top:14px;background:#F2F4F7;border-left:4px solid var(--red);padding:13px 15px;border-radius:0 12px 12px 0;color:#344054;font-size:14px}
+    .meaning strong{color:#101828}
+    @media(max-width:980px){.hero,.main{grid-template-columns:1fr}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.translation-grid{grid-template-columns:1fr}.result-head{grid-template-columns:1fr}.level{justify-self:start}}
     @media(max-width:560px){.page{padding:22px 14px 40px}.hero{padding:24px;border-radius:20px}.grid{grid-template-columns:1fr}.card-pad,.result-body,.result-head{padding:18px}.actions .btn{width:100%}}
   </style>
 </head>
@@ -95,6 +106,11 @@
       </div>
       <div class="result-body">
         <div class="summary" id="summary"></div>
+        <div class="translation" id="translationBox" style="display:none">
+          <h3>📖 Traducción del código</h3>
+          <div class="translation-grid" id="translationGrid"></div>
+          <div class="meaning" id="meaning"></div>
+        </div>
         <div>
           <h3 class="section-title">Parámetros importantes</h3>
           <div class="grid" id="params"></div>
@@ -120,7 +136,7 @@
       <h3>Regla de uso en clase</h3>
       <p>No gana quien más términos técnicos use. Gana quien vuelve a DevTools y sabe explicar qué está viendo.</p>
     </div>
-    <div class="footnote">AdTech Inspector AI v1 · herramienta docente para formación Display & RTB</div>
+    <div class="footnote">AdTech Inspector AI v1.0 · herramienta docente para formación Display & RTB</div>
   </div>
 
 <script>
@@ -146,6 +162,28 @@ const findAttr = (txt, attr) => {
 };
 const allMatches = (txt, re) => [...txt.matchAll(re)].map(m=>m[1]||m[0]);
 const truncate = (s,n=76)=> !s ? "" : (s.length>n ? s.slice(0,n-1)+"…" : s);
+const bidderInfo = (b) => {
+  const key = String(b||"").toLowerCase();
+  const map = {
+    pubmatic:["PubMatic","SSP / Ad Exchange"], criteo:["Criteo","Commerce Media / demand partner"],
+    ttd:["The Trade Desk","DSP"], ix:["Index Exchange","SSP / Ad Exchange"],
+    rubicon:["Magnite","SSP / Ad Exchange"], openx:["OpenX","SSP / Ad Exchange"],
+    appnexus:["Xandr / Microsoft Monetize","SSP / Exchange"], ra_wemass:["WEMASS","SSP / Sales house"],
+    richaudience:["RichAudience","SSP / Demand partner"], pubstack_server:["Pubstack Server","Server-side bidder"],
+    optidigital:["Opti Digital","Yield / bidder"], amazon:["Amazon","Demand partner"]
+  };
+  return map[key] || [b, "Plataforma que participa en Header Bidding"];
+};
+const iabFormat = (s) => {
+  const key = String(s||"").trim();
+  const map = {"300x250":"Medium Rectangle / Robapáginas","300x600":"Half Page","728x90":"Leaderboard","970x250":"Billboard","970x90":"Large Leaderboard","300x100":"Mobile banner grande","300x300":"Square","1x1":"Tamaño técnico / tracking / formato especial"};
+  return map[key] || "Formato display";
+};
+const cpmNote = (v) => {
+  const n = parseFloat(String(v).replace(',', '.'));
+  return isFinite(n) ? `${String(v).replace('.', ',')} € por cada 1.000 impresiones · ≈ ${(n/1000).toFixed(5).replace('.', ',')} € por impresión` : "Valor CPM enviado a GAM como price bucket";
+};
+
 
 const examples = [
   {name:"Request GAM + Header Bidding", desc:"gampad/ads con hb_bidder y hb_pb", value:"/gampad/ads?gdfp_req=1&iu_parts=1018282%2Cxataka%2Chomepage&prev_iu_szs=728x90%7C970x250&dids=div-gpt-top&url=https%3A%2F%2Fwww.xataka.com%2F&gdpr=1&prev_scp=hb_bidder%3Dpubmatic%26hb_pb%3D0.66%26hb_size%3D300x250%26hb_adid%3D501d383fef7a0ef%26hb_source%3Dclient&cust_params=site%3DXTK%26vertical%3DTechnology%26visitor_country%3DES"},
@@ -159,7 +197,7 @@ const examples = [
 
 function detect(txt){
   const raw = txt.trim(); const low = raw.toLowerCase(); const decoded = decode(raw); const dlow = decoded.toLowerCase();
-  const params = queryParams(decoded); const ev=[]; const cards=[]; let look=[]; let result={icon:"🧩", type:"Fragmento parcialmente reconocido", level:"medium", summary:[], curiosity:"Cuando el fragmento parece raro, no hay que forzar conclusiones: primero identifica qué señales sí están presentes.", evidence:ev, cards, lookFor:look};
+  const params = queryParams(decoded); const ev=[]; const cards=[]; let look=[]; let result={icon:"🧩", type:"Fragmento parcialmente reconocido", level:"medium", summary:[], curiosity:"Cuando el fragmento parece raro, no hay que forzar conclusiones: primero identifica qué señales sí están presentes.", evidence:ev, cards, lookFor:look, translation:[], meaning:""};
   const add=(k,v,mono=false)=>{ if(v!==undefined && v!==null && String(v)!=="") cards.push({k,v:String(v),mono}); };
   const found=(s)=>ev.push(s);
   const has = (s)=> dlow.includes(s.toLowerCase());
@@ -189,6 +227,21 @@ function detect(txt){
     const cust = queryParams(params.cust_params||"");
     if(cust.vertical) add("Vertical",cust.vertical);
     if(cust.visitor_country) add("País",cust.visitor_country);
+
+    const hb = queryParams(scp);
+    const inv = params.iu || (params.iu_parts ? "/" + params.iu_parts.replace(/,/g,"/") : "");
+    const bidder = hb.hb_bidder ? bidderInfo(hb.hb_bidder) : null;
+    const tr=[];
+    if(bidder) tr.push({q:"¿Quién ha realizado la puja?", ans:bidder[0], note:bidder[1]});
+    if(hb.hb_pb) tr.push({q:"¿Cuánto está dispuesto a pagar?", ans:String(hb.hb_pb).replace('.', ',') + " € CPM", note:cpmNote(hb.hb_pb)});
+    if(hb.hb_size) tr.push({q:"¿Qué tamaño de banner quiere mostrar?", ans:hb.hb_size.replace('x',' × ') + " px", note:iabFormat(hb.hb_size)});
+    if(inv) tr.push({q:"¿Qué espacio publicitario está solicitando?", ans:inv, note:"Inventario solicitado en Google Ad Manager", mono:true});
+    const ctx=[]; if(cust.site) ctx.push("site=" + cust.site); if(cust.vertical) ctx.push("vertical=" + cust.vertical); if(cust.visitor_country) ctx.push("país=" + cust.visitor_country);
+    if(ctx.length) tr.push({q:"¿Qué contexto envía el publisher?", ans:ctx.join(" · "), note:"Información contextual enviada a GAM", mono:true});
+    result.translation=tr;
+    if(bidder || hb.hb_pb || hb.hb_size){
+      result.meaning = `${bidder ? "<strong>"+bidder[0]+"</strong>" : "Un bidder"}${hb.hb_pb ? " ha ofertado <strong>"+String(hb.hb_pb).replace('.', ',')+" € CPM</strong>" : " ha enviado una oferta"}${hb.hb_size ? " para mostrar un banner <strong>"+hb.hb_size.replace('x','×')+"</strong>" : ""}${inv ? " en <strong>"+inv+"</strong>" : ""}.`;
+    }
     look=["gampad/ads","iu_parts / iu","prev_iu_szs / sz","cust_params","hb_bidder","hb_pb","gdpr","url"];
     result.curiosity="La request de GAM no es la creatividad final. Es la petición que lleva el contexto y las señales de subasta para que el ad server decida qué servir.";
     result.lookFor=look; return result;
@@ -313,6 +366,17 @@ function render(res, raw){
   $("resultSubtitle").textContent="¿Qué acabas de copiar?";
   const lvl=$("resultLevel"); lvl.className="level "+(res.level||"medium"); lvl.textContent=res.level==="advanced"?"Avanzado":res.level==="basic"?"Básico":"Intermedio";
   $("summary").innerHTML=res.summary.map(p=>`<p>${p}</p>`).join("");
+  const tbox=$("translationBox");
+  if(res.translation && res.translation.length){
+    tbox.style.display="block";
+    $("translationGrid").innerHTML=res.translation.map(t=>`<div class="tcard"><div class="q">${t.q}</div><div class="ans ${t.mono?'mono':''}">${t.ans}</div>${t.note?`<div class="note">${t.note}</div>`:""}</div>`).join("");
+    $("meaning").innerHTML=res.meaning || "";
+    $("meaning").style.display=res.meaning ? "block" : "none";
+  } else {
+    tbox.style.display="none";
+    $("translationGrid").innerHTML="";
+    $("meaning").innerHTML="";
+  }
   $("params").innerHTML=(res.cards.length?res.cards:[{k:"Resultado",v:"No hay parámetros claros",mono:false}]).slice(0,10).map(c=>`<div class="param"><div class="k">${c.k}</div><div class="v ${c.mono?'mono':''}">${c.v}</div></div>`).join("");
   $("lookFor").innerHTML=(res.lookFor||[]).map(x=>`<span class="pill">${x}</span>`).join("");
   $("curiosity").textContent=res.curiosity||"La clave es volver siempre a DevTools y comprobar las señales en su contexto original.";
@@ -330,5 +394,17 @@ $("rawBtn").addEventListener("click",()=>$("raw").classList.toggle("show"));
 $("examples").innerHTML=examples.map((e,i)=>`<button class="ex" data-i="${i}"><b>${e.name}</b><span>${e.desc}</span></button>`).join("");
 document.querySelectorAll(".ex").forEach(b=>b.addEventListener("click",()=>{ $("input").value=examples[+b.dataset.i].value; analyze(); }));
 </script>
-</body>
+<section style="margin:24px;padding:18px;border:1px solid #ccc;border-radius:8px;background:#fafafa">
+<h2>🧠 Parámetros que debes aprender</h2>
+<ul>
+<li><b>iu</b>: Ad Unit solicitado.</li>
+<li><b>hb_bidder</b>: Plataforma (SSP/Exchange) que realiza la puja.</li>
+<li><b>hb_pb</b>: CPM ofertado (price bucket) por cada 1.000 impresiones.</li>
+<li><b>hb_size</b>: Tamaño del banner al que corresponde la puja.</li>
+<li><b>cust_params</b>: Contexto enviado por el publisher.</li>
+</ul>
+<p><b>⚠️ No los confundas</b>: <code>hb_size=300x250</code> = tamaño del banner. <code>hb_pb=0.66</code> = 0,66 € CPM.</p>
+<h3>Diccionario de bidders</h3>
+<ul><li>pubmatic → SSP / Ad Exchange</li><li>criteo → Commerce Media</li><li>ttd → The Trade Desk</li><li>ix → Index Exchange</li><li>rubicon → Magnite</li><li>openx → OpenX</li><li>appnexus → Xandr</li></ul>
+</section></body>
 </html>
