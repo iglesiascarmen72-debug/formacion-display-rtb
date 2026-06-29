@@ -50,6 +50,132 @@
     @media(max-width:980px){.hero,.main{grid-template-columns:1fr}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.translation-grid{grid-template-columns:1fr}.result-head{grid-template-columns:1fr}.level{justify-self:start}}
     @media(max-width:560px){.page{padding:22px 14px 40px}.hero{padding:24px;border-radius:20px}.grid{grid-template-columns:1fr}.card-pad,.result-body,.result-head{padding:18px}.actions .btn{width:100%}}
   </style>
+
+<style id="request-translation-styles">
+.request-translation-block{
+  margin:28px auto;
+  padding:22px;
+  max-width:1100px;
+  border:1px solid #E2E6ED;
+  border-radius:18px;
+  background:#FFFFFF;
+  box-shadow:0 12px 34px rgba(14,17,22,.06);
+  color:#18202A;
+  font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+.translation-header{
+  display:flex;
+  justify-content:space-between;
+  gap:16px;
+  align-items:flex-start;
+  margin-bottom:18px;
+}
+.translation-kicker{
+  display:inline-block;
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:#C3002F;
+  margin-bottom:4px;
+}
+.translation-header h2{
+  margin:0;
+  font-size:24px;
+  line-height:1.2;
+}
+.translation-badge{
+  display:inline-flex;
+  align-items:center;
+  padding:6px 10px;
+  border-radius:999px;
+  background:#F3F5F8;
+  color:#4D5968;
+  font-size:12px;
+  font-weight:700;
+  white-space:nowrap;
+}
+.translation-grid{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:12px;
+}
+.translation-card{
+  border:1px solid #E4E7EC;
+  background:#FAFBFC;
+  border-radius:14px;
+  padding:16px;
+  min-height:160px;
+}
+.translation-card.wide{
+  grid-column:span 4;
+  min-height:auto;
+}
+.translation-question{
+  color:#5E6A78;
+  font-size:13px;
+  font-weight:700;
+  margin-bottom:8px;
+}
+.translation-value{
+  font-size:20px;
+  line-height:1.25;
+  font-weight:800;
+  color:#111827;
+  margin-bottom:8px;
+  word-break:break-word;
+}
+.translation-value.mono{
+  font-family:"JetBrains Mono",Consolas,monospace;
+  font-size:15px;
+}
+.translation-card p{
+  margin:0 0 12px;
+  color:#4B5563;
+  font-size:13px;
+  line-height:1.55;
+}
+.translation-card code,
+.translation-warning code{
+  display:inline-block;
+  padding:2px 7px;
+  border-radius:7px;
+  background:#EEF2F7;
+  color:#253044;
+  font-family:"JetBrains Mono",Consolas,monospace;
+  font-size:12px;
+}
+.translation-summary{
+  margin-top:14px;
+  padding:15px 16px;
+  border-radius:14px;
+  background:#EEF6FF;
+  border:1px solid #CFE4FF;
+  color:#0B3768;
+  font-size:15px;
+  line-height:1.55;
+}
+.translation-warning{
+  margin-top:10px;
+  padding:13px 16px;
+  border-radius:14px;
+  background:#FFF7E8;
+  border:1px solid #F3D19B;
+  color:#67430A;
+  font-size:14px;
+  line-height:1.55;
+}
+@media(max-width:900px){
+  .translation-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
+  .translation-card.wide{grid-column:span 2;}
+}
+@media(max-width:620px){
+  .translation-header{flex-direction:column;}
+  .translation-grid{grid-template-columns:1fr;}
+  .translation-card.wide{grid-column:span 1;}
+}
+</style>
+
 </head>
 <body>
   <div class="topbar"></div>
@@ -406,5 +532,169 @@ document.querySelectorAll(".ex").forEach(b=>b.addEventListener("click",()=>{ $("
 <p><b>⚠️ No los confundas</b>: <code>hb_size=300x250</code> = tamaño del banner. <code>hb_pb=0.66</code> = 0,66 € CPM.</p>
 <h3>Diccionario de bidders</h3>
 <ul><li>pubmatic → SSP / Ad Exchange</li><li>criteo → Commerce Media</li><li>ttd → The Trade Desk</li><li>ix → Index Exchange</li><li>rubicon → Magnite</li><li>openx → OpenX</li><li>appnexus → Xandr</li></ul>
-</section></body>
+</section>
+<!-- BLOQUE FINAL · TRADUCCIÓN DE LA REQUEST -->
+<section id="request-translation-block" class="request-translation-block" aria-labelledby="request-translation-title">
+  <div class="translation-header">
+    <div>
+      <span class="translation-kicker">Bloque docente</span>
+      <h2 id="request-translation-title">📖 Traducción de la request</h2>
+    </div>
+    <span class="translation-badge">DevTools → lenguaje humano</span>
+  </div>
+
+  <div class="translation-grid">
+    <article class="translation-card">
+      <div class="translation-question">¿Quién puja?</div>
+      <div class="translation-value" id="translation-bidder">PubMatic</div>
+      <p>SSP / Ad Exchange que participa en Header Bidding intentando comprar esta impresión.</p>
+      <code>hb_bidder</code>
+    </article>
+
+    <article class="translation-card">
+      <div class="translation-question">¿Cuánto ofrece?</div>
+      <div class="translation-value" id="translation-cpm">0,66 € CPM</div>
+      <p>Es decir: 0,66 € por cada 1.000 impresiones. Aproximadamente 0,00066 € por una sola impresión.</p>
+      <code>hb_pb</code>
+    </article>
+
+    <article class="translation-card">
+      <div class="translation-question">¿Qué banner quiere mostrar?</div>
+      <div class="translation-value" id="translation-size">300 × 250 px</div>
+      <p>Formato IAB: Medium Rectangle / Robapáginas.</p>
+      <code>hb_size</code>
+    </article>
+
+    <article class="translation-card">
+      <div class="translation-question">¿Dónde quiere mostrarlo?</div>
+      <div class="translation-value mono" id="translation-inventory">/1018282/xataka/homepage</div>
+      <p>Inventario solicitado a Google Ad Manager.</p>
+      <code>iu</code>
+    </article>
+
+    <article class="translation-card wide">
+      <div class="translation-question">¿Qué información conoce del contexto?</div>
+      <div class="translation-value" id="translation-context">Site: XTK · Vertical: Technology · País: ES</div>
+      <p>El publisher envía información contextual para ayudar a GAM a decidir qué anuncio servir.</p>
+      <code>cust_params</code>
+    </article>
+  </div>
+
+  <div class="translation-summary" id="translation-summary">
+    <strong>🧠 En una frase:</strong>
+    PubMatic ha ofertado <strong>0,66 € CPM</strong> para mostrar un banner <strong>300×250</strong> en el espacio publicitario <strong>homepage</strong> de Xataka.
+  </div>
+
+  <div class="translation-warning">
+    <strong>⚠️ No los confundas:</strong>
+    <code>hb_size=300x250</code> indica el tamaño del banner. 
+    <code>hb_pb=0.66</code> indica el CPM ofertado.
+  </div>
+</section>
+
+
+<script id="request-translation-dynamic">
+(function(){
+  function decodeDeep(value){
+    if(!value) return "";
+    let out = String(value).replace(/&amp;/g,"&");
+    for(let i=0;i<3;i++){
+      try {
+        const dec = decodeURIComponent(out);
+        if(dec === out) break;
+        out = dec;
+      } catch(e){ break; }
+    }
+    return out;
+  }
+  function getParam(text, key){
+    const decoded = decodeDeep(text);
+    const re = new RegExp("(?:[?&]|^|%26|&amp;|&)" + key.replace(/[.*+?^${}()|[\]\\]/g,'\\$&') + "=([^&%\\s<>\"']+)", "i");
+    const m = decoded.match(re);
+    return m ? decodeDeep(m[1]) : "";
+  }
+  function inferFormat(size){
+    const map = {
+      "300x250":"Medium Rectangle / Robapáginas",
+      "300x600":"Half Page",
+      "728x90":"Leaderboard",
+      "970x250":"Billboard",
+      "970x90":"Super Leaderboard",
+      "320x50":"Mobile Banner",
+      "300x100":"Mobile / banner compacto",
+      "300x300":"Square"
+    };
+    return map[size] || "Formato display";
+  }
+  function knownBidder(v){
+    const b = (v || "").toLowerCase();
+    const map = {
+      "pubmatic":"PubMatic",
+      "criteo":"Criteo",
+      "ttd":"The Trade Desk",
+      "ix":"Index Exchange",
+      "rubicon":"Magnite",
+      "openx":"OpenX",
+      "appnexus":"Xandr",
+      "ra_wemass":"Wemass",
+      "richaudience":"Richaudience",
+      "pubstack_server":"Pubstack Server",
+      "optidigital":"Opti Digital"
+    };
+    return map[b] || v || "No detectado";
+  }
+  function updateTranslation(text){
+    if(!text) return;
+    const bidderRaw = getParam(text, "hb_bidder");
+    const bidder = knownBidder(bidderRaw);
+    const pb = getParam(text, "hb_pb");
+    const size = getParam(text, "hb_size") || getParam(text, "sz");
+    const iu = getParam(text, "iu") || (decodeDeep(text).match(/\/\d+\/[A-Za-z0-9_\/.-]+/)||[""])[0];
+    const cust = getParam(text, "cust_params") || getParam(text, "prev_scp");
+    const decodedCust = decodeDeep(cust);
+    const site = getParam(decodedCust, "site");
+    const vertical = getParam(decodedCust, "vertical");
+    const country = getParam(decodedCust, "visitor_country");
+
+    const set = (id, val) => { const el=document.getElementById(id); if(el && val) el.textContent=val; };
+    set("translation-bidder", bidder);
+    if(pb) set("translation-cpm", pb.replace(".", ",") + " € CPM");
+    if(size) set("translation-size", size.replace("x"," × ") + " px");
+    if(iu) set("translation-inventory", iu);
+    const ctx = [];
+    if(site) ctx.push("Site: " + site);
+    if(vertical) ctx.push("Vertical: " + vertical);
+    if(country) ctx.push("País: " + country);
+    if(ctx.length) set("translation-context", ctx.join(" · "));
+
+    const summary = document.getElementById("translation-summary");
+    if(summary && (bidderRaw || pb || size || iu)){
+      summary.innerHTML = "<strong>🧠 En una frase:</strong> " +
+        (bidder !== "No detectado" ? bidder + " ha ofertado " : "La request indica una oferta ") +
+        (pb ? "<strong>" + pb.replace(".", ",") + " € CPM</strong> " : "") +
+        (size ? "para mostrar un banner <strong>" + size + "</strong> " : "") +
+        (iu ? "en el inventario <strong>" + iu + "</strong>." : ".");
+    }
+  }
+  function findInputText(){
+    const active = document.activeElement && (document.activeElement.tagName === "TEXTAREA" || document.activeElement.tagName === "INPUT") ? document.activeElement.value : "";
+    const areas = Array.from(document.querySelectorAll("textarea,input[type='text'],input:not([type])"));
+    const longest = areas.map(a=>a.value||"").sort((a,b)=>b.length-a.length)[0] || "";
+    return longest || active;
+  }
+  document.addEventListener("click", function(e){
+    const t = (e.target.textContent || "").toLowerCase();
+    if(t.includes("analizar")){
+      setTimeout(()=>updateTranslation(findInputText()), 80);
+    }
+  });
+  document.addEventListener("input", function(e){
+    if(e.target && (e.target.tagName === "TEXTAREA" || e.target.tagName === "INPUT")){
+      updateTranslation(e.target.value);
+    }
+  });
+})();
+</script>
+
+</body>
 </html>
